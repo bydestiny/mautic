@@ -44,9 +44,9 @@ RUN npm ci \
     && npm run build
 
 # Generate Mautic production CSS and JavaScript assets.
-RUN php bin/console sass:build --env=prod --no-interaction \
-    && php bin/console mautic:assets:generate --env=prod --no-interaction \
-    && php bin/console cache:clear --env=prod --no-interaction
+RUN php -d memory_limit=1G bin/console sass:build --env=prod --no-interaction \
+    && php -d memory_limit=1G bin/console mautic:assets:generate --env=prod --no-interaction \
+    && php -d memory_limit=1G bin/console cache:clear --env=prod --no-interaction
 
 
 # Runtime image.
