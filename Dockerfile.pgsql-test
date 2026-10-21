@@ -2,7 +2,7 @@ FROM php:8.4-apache-bookworm AS build
 
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     COMPOSER_PROCESS_TIMEOUT=10000 \
-    APACHE_DOCUMENT_ROOT=/var/www/html/docroot
+    APACHE_DOCUMENT_ROOT=/var/www/html
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git unzip \
@@ -32,15 +32,14 @@ WORKDIR /var/www/html
 COPY . .
 
 # Install the dependencies pinned by this branch.
-RUN touch .env \
+RUN test -f .env || printf 'APP_ENV=prod\nAPP_DEBUG=0\n' > .env \
     && php -d memory_limit=1G /usr/local/bin/composer install \
-       --no-interaction --prefer-dist --optimize-autoloader --no-scripts \
-    && rm -f .env
+       --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 # Runtime image.
 FROM php:8.4-apache-bookworm AS runtime
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/docroot \
+ENV APACHE_DOCUMENT_ROOT=/var/www/html \
     PHP_INI_VALUE_DATE_TIMEZONE=UTC \
     PHP_INI_VALUE_MEMORY_LIMIT=512M \
     PHP_INI_VALUE_MAX_EXECUTION_TIME=300 \
