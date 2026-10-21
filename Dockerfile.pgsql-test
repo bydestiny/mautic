@@ -38,9 +38,16 @@ RUN test -f .env || printf 'APP_ENV=prod\nAPP_DEBUG=0\n' > .env \
     && php -d memory_limit=1G /usr/local/bin/composer install \
        --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
+
 # Install frontend dependencies and compile Mautic assets.
 RUN npm ci \
     && npm run build
+
+# Generate Mautic production CSS and JavaScript assets.
+RUN php bin/console sass:build --env=prod --no-interaction \
+    && php bin/console mautic:assets:generate --env=prod --no-interaction \
+    && php bin/console cache:clear --env=prod --no-interaction
+
 
 # Runtime image.
 FROM php:8.4-apache-bookworm AS runtime
@@ -77,9 +84,16 @@ RUN sed -ri \
       -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
       /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
     && a2enmod rewrite \
-    && mkdir -p /var/www/html/var /var/www/html/config \
-    && chown -R www-data:www-data /var/www/html/var \
-    && chown -R www-data:www-data /var/www/html/config
+    && mkdir -p \
+       /var/www/html/var \
+       /var/www/html/config \
+       /var/www/html/media \
+       /var/www/html/public/assets \
+    && chown -R www-data:www-data \
+       /var/www/html/var \
+       /var/www/html/config \
+       /var/www/html/media \
+       /var/www/html/public
 
 WORKDIR /var/www/html
 EXPOSE 80
