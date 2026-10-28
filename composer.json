@@ -44,7 +44,6 @@
     "phpunit/phpunit": "^11.5",
     "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
-    "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
     "symfony/phpunit-bridge": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",
@@ -248,6 +247,9 @@
       },
       "jms/serializer-bundle": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/jms-serializer-bundle-spl-object-id.patch"
+      },
+      "jumbojett/openid-connect-php": {
+        "PHP 8.4+ explicit nullable parameter types": "patches/jumbojett-openid-connect-php-v1.0.2-explicit-nullable.patch"
       },
       "klapaudius/oauth-server-bundle": {
         "PHP 8.6+ precision lost in conversion fix": "patches/klapaudius-oauth-server-bundle-lost-precision.patch"
