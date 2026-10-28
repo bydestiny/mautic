@@ -45,4 +45,3 @@ final class CustomTokenSubscriber implements EventSubscriberInterface
         }
     }
 }
-
