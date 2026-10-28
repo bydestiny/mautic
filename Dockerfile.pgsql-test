@@ -43,6 +43,11 @@ RUN test -f .env || printf 'APP_ENV=prod\nAPP_DEBUG=0\n' > .env \
 RUN npm ci \
     && npm run build
 
+# Build the GrapesJS email builder plugin assets.
+RUN npm ci --prefix plugins/GrapesJsBuilderBundle --no-audit \
+    && npm run build --prefix plugins/GrapesJsBuilderBundle \
+    && test -f plugins/GrapesJsBuilderBundle/Assets/library/js/dist/manifest.json
+
 # Generate Mautic production CSS and JavaScript assets.
 RUN php -d memory_limit=1G bin/console sass:build --env=prod --no-interaction \
     && php -d memory_limit=1G bin/console mautic:assets:generate --env=prod --no-interaction \
