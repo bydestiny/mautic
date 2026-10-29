@@ -71,6 +71,8 @@ RUN printf '%s\n' \
     'upload_max_filesize = 64M' \
     'post_max_size = 64M' \
     'zend.assertions = -1' \
+    'log_errors = On' \
+    'display_errors = Off' \
     > /usr/local/etc/php/conf.d/mautic.ini
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -81,9 +83,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=build /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=build /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=build /var/www/html /var/www/html
-
-RUN mkdir -p /var/www/html/var/cache /var/www/html/var/logs \
-    && chown -R www-data:www-data /var/www/html/var
 
 RUN sed -ri \
       -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
@@ -103,5 +102,13 @@ RUN sed -ri \
        /var/www/html/media \
        /var/www/html/public
 
+USER root
+COPY docker-entrypoint-mautic.sh /usr/local/bin/docker-entrypoint-mautic
+
+RUN chmod 0755 /usr/local/bin/docker-entrypoint-mautic
 WORKDIR /var/www/html
 EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint-mautic"]
+CMD ["apache2-foreground"]
+
