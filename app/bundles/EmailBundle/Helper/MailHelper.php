@@ -1503,7 +1503,10 @@ class MailHelper
 
         $event = new EmailSendEvent($this);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
-        $this->eventTokens = $event->getTokens(false);
+        $this->eventTokens =array_merge(
+            $this->eventTokens,
+            $event->getTokens(false)
+        );
     }
 
     /**
